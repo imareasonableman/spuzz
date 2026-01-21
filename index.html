@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<title>type</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 2rem;
+  background: #0b0b0b;
+  color: #eee;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+  padding-bottom: 0.5rem;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+.card img {
+  width: 100%;
+  display: block;
+}
+
+.card h3 {
+  margin: 0.5rem 0 0.2rem;
+  font-size: 0.95rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.card { cursor: pointer; }
+.card:focus { outline: 2px solid #888; }
+
+#player {
+  margin-top: 3.5rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.6rem;
+  background: #333;
+  color: #eee;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #555;
+}
+
+#error {
+  text-align: center;
+  color: #ff6b6b;
+  margin-top: 2rem;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 998;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  color: #eee;
+  max-width: 320px;
+  padding: 1.2rem;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 90px;
+  right: 20px;
+}
+
+.modal-content a {
+  display: block;
+  margin: 0.5rem 0;
+  color: #1db954;
+  text-decoration: none;
+}
+
+.modal-content button {
+  background: #333;
+  color: #eee;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+@keyframes rainbowGlow {
+  0%   { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+  14%  { color: #ff7f00; text-shadow: 0 0 5px #ff7f00; }
+  28%  { color: #ffff00; text-shadow: 0 0 5px #ffff00; }
+  42%  { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
+  57%  { color: #0000ff; text-shadow: 0 0 5px #0000ff; }
+  71%  { color: #4b0082; text-shadow: 0 0 5px #4b0082; }
+  85%  { color: #8f00ff; text-shadow: 0 0 5px #8f00ff; }
+  100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+}
+
+.rainbow-glow {
+  animation: rainbowGlow 2s linear infinite;
+  font-weight: bold;
+  text-shadow:
+     0 0 5px currentColor,
+     0 0 10px currentColor,
+     0 0 20px currentColor,
+     0 0 30px currentColor;
+  transition: text-shadow 0.2s ease;
+}
+
+.rainbow-glow:hover {
+  text-shadow:
+     0 0 10px currentColor,
+     0 0 20px currentColor,
+     0 0 30px currentColor,
+     0 0 40px currentColor,
+     0 0 50px currentColor,
+     0 0 60px currentColor;
+}
+
+/* Container for rainbow glow + particles */
+.glow-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Enhanced rainbow-glow text */
+.rainbow-glow {
+  animation: rainbowGlow 3s linear infinite, glowPulse 1.5s ease-in-out infinite alternate;
+  font-weight: bold;
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 30px currentColor,
+    0 0 40px currentColor;
+}
+
+/* Pulsing glow */
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor; }
+  100% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor; }
+}
+
+/* Particles */
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: currentColor; /* match rainbow color dynamically */
+  border-radius: 50%;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: float 3s linear infinite;
+  filter: blur(1.5px);
+}
+
+@keyframes float {
+  0% { transform: translate(0,0) scale(1); opacity:1;}
+  50% { transform: translate(var(--x), var(--y)) scale(0.5); opacity:0.5;}
+  100% { transform: translate(0,0) scale(1); opacity:1;}
+}
+
+#backToSearch {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  border: none;
+  background: #222;
+  color: #eee;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 1000;
+}
+
+#backToSearch.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+#backToSearch:hover {
+  background: #444;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- STICKY WARNING BANNER -->
+<div style="
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 0.8rem;
+  background: #222;
+  color: #eee;
+  text-align: center;
+  border-bottom: 1px solid #333;
+  z-index: 1000;
+  box-sizing: border-box;
+">
+  😂✌ ts only work if ur already signed in on ur chromebook... 😂✌
+</div>
+
+<!-- SEARCH + CATEGORY FILTER -->
+<div style="
+  margin: 1rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+">
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="Search artists..."
+    style="
+      padding: 0.6rem;
+      background: #111;
+      color: #eee;
+      border: 1px solid #333;
+      border-radius: 6px;
+      min-width: 200px;
+      flex: 1 1 200px;
+    "
+  />
+
+  <select id="categoryFilter"
+    style="
+      padding: 0.6rem;
+      background: #111;
+      color: #eee;
+      border: 1px solid #333;
+      border-radius: 6px;
+      flex: 0 0 150px;
+    ">
+    <option value="all">All</option>
+    <option value="rock">Rock</option>
+    <option value="hiphop">Hip-Hop</option>
+    <option value="rap">Rap</option>
+    <option value="pop">Pop</option>
+    <option value="alt">Alternative</option>
+    <option value="indie">Indie</option>
+    <option value="r&b">R&B</option>
+    <option value="hispanic">Hispanic</option>
+    <option value="jazzpop">Jazz-Pop</option>
+    <option value="metal">Metal</option>
+    <option value="synthpop">Synth-Pop</option>
+    <option value="shoegaze">Shoegaze</option>
+    <option value="soul">Soul</option>
+
+  </select>
+
+  <button id="clearSearch"
+    style="
+      padding: 0.6rem;
+      background: #222;
+      color: #eee;
+      border: 1px solid #333;
+      border-radius: 6px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    ">
+    Clear
+  </button>
+</div>
+
+<button id="backToSearch" title="Back to search">↑</button>
+
+
+<h1>type chris(h)</h1>
+
+<div id="content"></div>
+<div id="player"></div>
+<div id="error"></div>
+
+<script>
+// ------------------- ARTISTS & ALBUMS -------------------
+const artists = [
+  {
+    name: "Radiohead",
+    categories: ["alt", "rock"],
+    image: "https://images.bauerhosting.com/marketing/sites/16/2023/05/Radiohead-1995-hero.jpg?ar=16%3A9&fit=crop&crop=top&auto=format&w=undefined&q=80",
+    albums: [
+      { name: "Pablo Honey", id: "3gBVdu4a1MMJVMy6vwPEb8", year: 1993 },
+      { name: "The Bends", id: "35UJLpClj5EDrhpNIi4DFg", year: 1995 },
+      { name: "OK Computer", id: "6dVIqQ8qmQ5GBnJ9shOYGE", year: 1997 },
+      { name: "Kid A", id: "6GjwtEZcfenmOf6l18N7T7", year: 2000 },
+      { name: "Amnesiac", id: "1HrMmB5useeZ0F5lHrMvl0", year: 2001 },
+      { name: "Hail to the Thief", id: "5mzoI3VH0ZWk1pLFR6RoYy", year: 2003 },
+      { name: "In Rainbows", id: "7eyQXxuf2nGj9d2367Gi5f", year: 2007 },
+      { name: "The King of Limbs", id: "3P17levwUPzmFfLYdAK3A7", year: 2011 },
+      { name: "A Moon Shaped Pool", id: "2ix8vWvvSp2Yo7rKMiWpkg", year: 2016 }
+    ]
+  },
+  {
+    name: "Mitski",
+    categories: ["indie", "alt"],
+    image: "https://i.guim.co.uk/img/media/a7006c663d1afe6521075d07c31300a34c7fe64c/0_242_5472_3283/master/5472.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=bef8a5ac63739457324e52746576bd77",
+    albums: [
+      { name: "Bury Me at Makeout Creek", id: "3saw8V9zR6x6ZbbqUl15QJ", year: 2014 },
+      { name: "Puberty 2", id: "4Coa8Eb9SzjrkwWEom963Q", year: 2016 },
+      { name: "Be The Cowboy", id: "42cH7mrkfljkqkxA2Ip9Xq", year: 2018 },
+    ]
+  },
+  {
+    name: "Tame Impala",
+    categories: ["alt", "rock", "pop"],
+    image: "https://cdn-images.dzcdn.net/images/artist/879015e713cc6ad6ffaeec154c027505/1900x1900-000000-80-0-0.jpg",
+    albums: [
+      { name: "Lonerism", id: "3C2MFZ2iHotUQOSBzdSvM7", year: 2012 },
+      { name: "Currents", id: "79dL7FLiJFOO0EoehUHQBv", year: 2015 },
+      { name: "The Slow Rush", id: "31qVWUdRrlb8thMvts0yYL", year: 2020 },
+    ]
+  },
+  {
+    name: "Muse",
+    categories: ["alt", "rock"],
+    image: "https://media.readdork.com/wp-content/uploads/2023/09/muse-sept23.jpg",
+    albums: [
+      { name: "Showbiz", id: "6AyUVv7MnxxTuijp4WmrhO", year: 1999 },
+      { name: "Origin of Symmetry", id: "1AP6uGYHdakRgwuWQsP5pK", year: 2001 },
+      { name: "Absolution", id: "2Eq6RyxCm7qEAF2YLOxa4s", year: 2003 },
+    ]
+  },
+  {
+    name: "Kendrick Lamar",
+    categories: ["hiphop", "rap"],
+    image: "https://cdn.apollo.audio/one/media/67a9/d509/21f1/f16e/4738/dd12/Kendrick-Lamar.jpg?quality=80&format=jpg&crop=0,0,2860,5078&resize=crop",
+    albums: [
+      { name: "good kid, m.A.A.d city", id: "6PBZN8cbwkqm1ERj2BGXJ1", year: 2012 },
+      { name: "To Pimp a Butterfly", id: "7ycBtnsMtyVbbwTfJwRjSP", year: 2015 },
+      { name: "DAMN.", id: "4eLPsYPBmXABThSJ821sqY", year: 2017 },
+    ]
+  },
+  {
+    name: "Magdalena Bay",
+    categories: ["synthpop", "alt"],
+    image: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Magdalena_Bay_%2853775447004%29.jpg",
+    albums: [
+      { name: "Mercurial World", id: "01d2Rn2VtB6THtOb9nwM9p", year: 2015 },
+      { name: "Imaginal Disk", id: "4HTy9WFTYooRjE9giTmzAF", year: 2017 },
+    ]
+  },
+  {
+    name: "Coldplay",
+    categories: ["alt", "rock"],
+    image: "https://bookings.youniverse.at/wp-content/uploads/2023/03/coldplay-1661419563.958622.2560x1440.jpg",
+    albums: [
+      { name: "Parachutes", id: "6ZG5lRT77aJ3btmArcykra", year: 2000 },
+      { name: "A Rush of Blood to the Head", id: "0RHX9XECH8IVI3LNgWDpmQ", year: 2002 },
+      { name: "X&Y", id: "4E7bV0pzG0LciBSWTszra6", year: 2005 },
+    ]
+  },
+  {
+    name: "Tyler, the Creator",
+    categories: ["hiphop", "rap"],
+    image: "https://media.gq.com/photos/687fc24fff2d6cc7ed88b29a/master/w_2560%2Cc_limit/tyler.jpg",
+    albums: [
+      { name: "Goblin", id: "5dbCm8qaCdWnNdVyi3urUO", year: 2011 },
+      { name: "Wolf", id: "40QTqOBBxCEIQlLNdSjFQB", year: 2013 },
+      { name: "Cherry Bomb", id: "621OhgnZJ7Pz8iUazct1In", year: 2015 },
+      { name: "Flower Boy", id: "2nkto6YNI4rUYTLqEwWJ3o", year: 2017 },
+      { name: "Igor", id: "5zi7WsKlIiUXv09tbGLKsE", year: 2019 },
+      { name: "Call Me If You Get Lost", id: "45ba6QAtNrdv6Ke4MFOKk9", year: 2021 },
+      { name: "Chromakopia", id: "0U28P0QVB1QRxpqp5IHOlH", year: 2024 },
+      { name: "Don't Tap The Glass", id: "1jzv3jwZbt8lYfEtMjiD1R", year: 2025 },
+    ]
+  },
+  {
+    name: "SZA",
+    categories: ["r&b", "hiphop"],
+    image: "https://www.vibe.com/wp-content/uploads/2024/05/sza.png",
+    albums: [
+      { name: "Ctrl", id: "76290XdXVF9rPzGdNRWdCh", year: 2017 },
+      { name: "SOS", id: "07w0rG5TETcyihsEIZR3qG", year: 2022 },
+    ]
+  },
+  {
+    name: "Laufey",
+    categories: ["jazzpop", "indie"],
+    image: "https://scroar.net/wp-content/uploads/2024/05/Laufey-Bewitched_-The-Goddess-Edition-_CD_-243304293.webp",
+    albums: [
+      { name: "Typical of Me (EP)", id: "1ZSqGiN0icYQ9AjMRCAiRo", year: 2021 },
+      { name: "Everything I Know About Love", id: "777K2ytcKbDsX0AZ2y8CBS", year: 2022 },
+      { name: "Bewitched", id: "1rpCHilZQkw84A3Y9czvMO", year: 2023 },
+      { name: "A Matter of Time", id: "5rMOCuiWWbEBcHaKM69Hmv", year: 2025 },
+    ]
+  },
+  {
+    name: "Yeatttt (james type)",
+    categories: ["rap"],
+    image: "https://cdn-images.dzcdn.net/images/artist/87f49e3c06e20dcb431717d5ed502bf6/1900x1900-000000-80-0-0.jpg",
+    albums: [
+      { name: "2093", id: "1jXYc5gip5tqCTDOotfY5L", year: 2024 },
+      { name: "AftërLyfe", id: "25Uddgldy3slnChqKqHsIM", year: 2023 },
+      { name: "Lyfestyle", id: "70CmTAk7pocCYr4lwuDtOc", year: 2024 },
+    ]
+  },
+  {
+    name: "Frank Ocean",
+    categories: ["r&b"],
+    image: "https://static01.nyt.com/images/2016/11/20/arts/20CARAMANICA/20CARAMANICA-superJumbo.jpg",
+    albums: [
+      { name: "channel ORANGE", id: "392p3shh2jkxUxY2VHvlH8", year: 2012 },
+      { name: "Blonde", id: "3mH6qwIy9crq0I9YQbOuDf", year: 2016 },
+    ]
+  },
+  {
+    name: "Danny Lux",
+    categories: ["hispanic"],
+    image: "https://www.billboard.com/wp-content/uploads/2025/05/DannyLux-cr-Sean-Behr-press-2025-billboard-1548.jpg?w=1024",
+    albums: [
+      { name: "DLUX", id: "5pAgLx8XeBoItzjT81csbJ", year: 2023 },
+      { name: "Leyenda (Deluxe)", id: "7ywMhF2YkS01uWLrdNBvoU", year: 2025 },
+    ]
+  },
+  {
+    name: "Peso Pluma",
+    categories: ["hispanic"],
+    image: "https://static01.nyt.com/images/2023/10/08/multimedia/08peso-pluma-mqwt/08peso-pluma-mqwt-mediumSquareAt3X.jpg",
+    albums: [
+      { name: "Génesis", id: "4jox3ip1I39DFC2B7R5qLH", year: 2023 },
+      { name: "DINASTÍA", id: "3kJfKZWulX2oyatVMvDx6a", year: 2025 },
+    ]
+  },
+  {
+    name: "J. Cole",
+    categories: ["hiphop", "rap"],
+    image: "https://www.rollingstone.com/wp-content/uploads/2021/05/J.-Cole_Lead-Promo-Image.jpg?w=1581&h=1054&crop=1",
+    albums: [
+      { name: "Friday Night Lights", id: "4ghGEhWzY5ffry2IqgrnRg", year: 2010 },
+      { name: "2014 Forest Hills Drive", id: "0UMMIkurRUmkruZ3KGBLtG", year: 2014 },
+      { name: "4 Your Eyez Only", id: "3CCnGldVQ90c26aFATC1PW", year: 2016 },
+    ]
+  },
+  {
+    name: "Deftones",
+    categories: ["shoegaze", "rock", "metal"],
+    image: "https://media.zenfs.com/en/consequence_of_sound_458/005fc8e8cef71a34cfcba4fda57486de",
+    albums: [
+      { name: "Around the Fur", id: "7o4UsmV37Sg5It2Eb7vHzu", year: 1997 },
+      { name: "White Pony", id: "5LEXck3kfixFaA3CqVE7bC", year: 2000 },
+      { name: "Deftones", id: "6252G7bGCVijXlqAjtjeDP", year: 2003 },
+      { name: "Diamond Eyes", id: "1GjjBpY2iDwSQs5bykQI5e", year: 2010 },
+      { name: "private music", id: "1gmWnG5TeRj91Tdm2lpEvJ", year: 2025 },
+    ]
+  },
+  {
+    name: "Kanye West",
+    categories: ["hiphop", "rap"],
+    image: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Kanye_West_at_the_2009_Tribeca_Film_Festival_%28crop_2%29.jpg",
+    albums: [
+      { name: "The College Dropout", id: "4Uv86qWpGTxf7fU7lG5X6F", year: 2004 },
+      { name: "Late Registration", id: "5ll74bqtkcXlKE7wwkMq4g", year: 2005 },
+      { name: "Graduation", id: "4SZko61aMnmgvNhfhgTuD3", year: 2007 },
+      { name: "808s & Heartbreak", id: "3WFTGIO6E3Xh4paEOBY9OU", year: 2008 },
+      { name: "My Beautiful Dark Twisted Fantasy", id: "20r762YmB5HeofjMCiPMLv", year: 2010 },
+      { name: "Yeezus", id: "7D2NdGvBHIavgLhmcwhluK", year: 2013 },
+      { name: "The Life of Pablo", id: "7gsWAHLeT0w7es6FofOXk1", year: 2016 },
+      { name: "JESUS IS KING", id: "0FgZKfoU2Br5sHOfvZKTI9", year: 2019 },
+      { name: "Donda", id: "5CnpZV3q5BcESefcB3WJmz", year: 2021 },
+
+    ]
+  },
+  {
+    name: "Interpol",
+    categories: ["rock", "indie", "alt"],
+    image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/2015_RiP_Interpol_collage.jpg",
+    albums: [
+      { name: "Turn on the Bright Lights", id: "79deKDaslwLfH3yPR2T3SB", year: 2002 },
+      { name: "Antics", id: "2OFkUKYNNFQ74kJOSc9gzz", year: 2004 },
+      { name: "Our Love to Admire", id: "1gsoIHeBan6QywhysNgApK", year: 2007 },
+      { name: "El Pintor", id: "0YAtJCLY8ogFUjdopdHsyS", year: 2014 },
+      { name: "Marauder", id: "3h5FWXoJEw2MFmUOMfVke2", year: 2018 },
+    ]
+  },
+  {
+    name: "Rod Wave",
+    categories: ["r&b", "soul"],
+    image: "https://cdn-images.dzcdn.net/images/artist/317fdb25ec62d66553f0ca1a090b7d24/1900x1900-000000-80-0-0.jpg",
+    albums: [
+      { name: "Ghetto Gospel", id: "1ft5RivOWEdZT3nfqThV7K", year: 2019 },
+      { name: "Pray 4 Love", id: "7a5cMcFWSeppy4Soc0QHcY", year: 2020 },
+      { name: "SoulFly", id: "7q5xGp0tEnJ8s1ZumqiRSk", year: 2021 },
+      { name: "Beautiful Mind", id: "0QdrshIUWbNGzw4dAtrLlL", year: 2022 },
+      { name: "Nostalgia", id: "0xojHpNNGFiPqc3TXmh6Gv", year: 2023 },
+      { name: "Last Lap", id: "4ffJTc6OVVJ7rr65r5CGbq", year: 2024 },
+    ]
+  },
+  {
+    name: "Danny Brown",
+    categories: ["hiphop", "alt"],
+    image: "https://i.guim.co.uk/img/media/0b8b88b71dde23613c895b9ed1c79803c968e483/0_140_5760_3456/master/5760.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=b6a82c9f6b65ceddb8055dc377a68446",
+    albums: [
+      { name: "The Hybrid", id: "0P4u1ZRM6CXePgpeF8ShmN", year: 2010 },
+      { name: "XXX", id: "5qD7PzBX5GsKgGx0jfn6uQ", year: 2011 },
+      { name: "Old", id: "5SC0415RIGVX9ZfL0tfbAl", year: 2013 },
+      { name: "Atrocity Exhibition", id: "3e7vtKJ3m1zVh38VGq2g3H", year: 2016 },
+      { name: "uknowhatimsayin¿", id: "5RCXsrdnNwXGDgKVYpWKHW", year: 2019 },
+      { name: "Quaranta", id: "2aswMmRN4vXGalI39pDsMb", year: 2023 },
+      { name: "Stardust", id: "0h3LYQns7VLlsMW7392Z1X", year: 2025 },
+    ]
+  },
+  {
+    name: "The Marías",
+    categories: ["pop", "alt", "indie"],
+    image: "https://atwoodmagazine.com/wp-content/uploads/2024/06/The-Marias-by-Ashley-Olah-1-1170x791.jpg",
+    albums: [
+      { name: "Superclean, Vol. I (EP)", id: "5XX1xVOP61GDQCGaZMLjhO", year: 2017 },
+      { name: "Superclean, Vol. II (EP)", id: "1Iu5sceGmML4CeQ2f5Q6aO", year: 2018 },
+      { name: "CINEMA", id: "5TkaDC4mYSLBvdG6UrIB0v", year: 2021 },
+      { name: "Submarine", id: "03guxdOi12XJbnvxvxbpwG", year: 2024 },
+    ]
+  },
+  {
+    name: "Daniel Caesar",
+    categories: ["r&b", "soul"],
+    image: "https://imageio.forbes.com/blogs-images/ogdenpayne/files/2017/02/Daniel-Caesar-NEw-by-Keith-Henry.jpg?format=jpg&height=900&width=1600&fit=bounds",
+    albums: [
+      { name: "Freudian", id: "4E1XUBMTpLO7GpBzUo65Jp", year: 2017 },
+      { name: "CASE STUDY 01", id: "4mvxoogQn8p84Wz17zTHnJ", year: 2019 },
+      { name: "NEVER ENOUGH", id: "2z9lM6LDS58F70IGyQ1XMK", year: 2023 },
+      { name: "Son Of Spergy", id: "2LKW0m9cC63QzEI9tJH3ql", year: 2025 },
+    ]
+  },
+  {
+    name: "Malcolm Todd",
+    categories: ["alt", "indie"],
+    image: "https://atwoodmagazine.com/wp-content/uploads/2024/11/Malcolm-Todd-by-Joseph-Morrison-3a-1170x781.jpeg",
+    albums: [
+      { name: "Demos Before Prom", id: "0Ui1bRlwrt02RZbyhYrN14", year: 2022 },
+      { name: "Shower Shoes", id: "1Dvdo6WBmDQWtvbyRasB7w", year: 2023 },
+      { name: "Sweet Boy Pt. 1", id: "038wFBV1FT6Q90Wpd3S4zm", year: 2024 },
+      { name: "Sweet Boy Pt. 2", id: "4hQLHqX3ht0FNuk2z5sKfG", year: 2024 },
+      { name: "Sweet Boy", id: "2jX6yKrWw9bY7JAYHhhtqZ", year: 2024 },
+      { name: "Malcolm Todd (self-titled)", id: "6IkS2cDHxaYVkJueCPSdFs", year: 2025 },
+
+    ]
+  },
+  {
+    name: "Matt Maltese",
+    categories: ["alt", "indie"],
+    image: "https://thefoxoakland.com/wp-content/uploads/2025/03/Matt-Maltese-Press-Photo-UPDATED.jpg",
+    albums: [
+      { name: "Bad Contestant", id: "7I6d6PkjEJE50fnxhCwQ8M", year: 2018 },
+      { name: "Krystal", id: "0DMKZZanrzK36YjFyI5nfF", year: 2019 },
+      { name: "Good Morning It's Now Tomorrow", id: "1hcwRc4Ic4tb2F8iLUGTTg", year: 2021 },
+      { name: "Driving Just To Drive", id: "28DLjjQKZ9qRvKFSu5Y7QM", year: 2023 },
+      { name: "Songs That Aren't Mine", id: "4Hfqnc8K019JtWci0BgXkE", year: 2024 },
+      { name: "Hers", id: "0XPxK2qGH4BelboUUiVRvE", year: 2025 },
+    ]
+  },
+  {
+    name: "Rosewater Park (UNFINISHED)",
+    categories: ["alt", "indie"],
+    image: "https://f4.bcbits.com/img/0040479207_10.jpg",
+    albums: [
+      { name: "Inside (single)", id: "0WfbFzkmcPSkQVW45ztdty", year: 2024 },
+      { name: "Saviour (single)", id: "6VKCtjgcfgZQjWoRYOuY49", year: 2024 },
+      { name: "Rocky Waters (single)", id: "0ahn29ruaEW21OAqxPpEfs", year: 2025 },
+      { name: "Dreaming In Blue (single)", id: "4kjmEK65ckvYczO7X4vFqB", year: 2025 },
+      { name: "Holy Ground (single)", id: "0Cqm70x7EZy1ccFZMwoW9A", year: 2025 },
+      { name: "Reckoning (single)", id: "0XPxK2qGH4BelboUUiVRvE", year: 2025 },
+      { name: "The One (single)", id: "0XPxK2qGH4BelboUUiVRvE", year: 2025 },
+
+    ]
+  },
+  {
+    name: "Billie Eilish",
+    categories: ["pop", "alt"],
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/BillieEilishO2160622_%2819_of_45%29_%2852153214339%29_%28cropped_3%29.jpg/960px-BillieEilishO2160622_%2819_of_45%29_%2852153214339%29_%28cropped_3%29.jpg",
+    albums: [
+      { name: "dont smile at me (EP)", id: "7fRrTyKvE4Skh93v97gtcU", year: 2017 },
+      { name: "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?", id: "0S0KGZnfBGSIssfF54WSJh", year: 2019 },
+      { name: "Happier Than Ever", id: "0JGOiO34nwfUdDrD612dOp", year: 2021 },
+      { name: "Guitar Songs (EP)", id: "1YPWxMpQEC8kcOuefgXbhj", year: 2022 },
+      { name: "Hit Me Hard and Soft", id: "7aJuG4TFXa2hmE4z1yxc3n", year: 2024 }
+    ]
+  },
+  {
+    name: "Clairo (ew)",
+    categories: ["alt", "indie"],
+    image: "https://static01.nyt.com/images/2018/05/24/arts/24clairo1/merlin_138539625_2983f99c-a11b-4cf5-a47e-09b35992e12d-superJumbo.jpg",
+    albums: [
+      { name: "Inside (single)", id: "0WfbFzkmcPSkQVW45ztdty", year: 2024 },
+      { name: "Saviour (single)", id: "6VKCtjgcfgZQjWoRYOuY49", year: 2024 },
+      { name: "Rocky Waters (single)", id: "0ahn29ruaEW21OAqxPpEfs", year: 2025 },
+      { name: "Dreaming In Blue (single)", id: "4kjmEK65ckvYczO7X4vFqB", year: 2025 },
+      { name: "Holy Ground (single)", id: "0Cqm70x7EZy1ccFZMwoW9A", year: 2025 },
+      { name: "Reckoning (single)", id: "0XPxK2qGH4BelboUUiVRvE", year: 2025 },
+      { name: "The One (single)", id: "0XPxK2qGH4BelboUUiVRvE", year: 2025 },
+
+    ]
+  },
+];
+
+// ------------------- RENDERING -------------------
+const content = document.getElementById("content");
+const player = document.getElementById("player");
+const errorDiv = document.getElementById("error");
+
+function renderHome() {
+  player.innerHTML = "";
+  content.innerHTML = "";
+
+  const searchInput = document.getElementById("searchInput");
+  const categoryFilter = document.getElementById("categoryFilter");
+
+  const query = searchInput.value.toLowerCase();
+  const category = categoryFilter.value;
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+
+  const filteredArtists = artists.filter(artist => {
+    const matchesSearch =
+      query === "" || artist.name.toLowerCase().includes(query);
+
+    const matchesCategory =
+      category === "all" || artist.categories.includes(category);
+
+    return matchesSearch && matchesCategory;
+  });
+
+  filteredArtists.forEach(artist => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+  <h3>${artist.name}</h3>
+  ${
+    artist.image
+      ? `<img src="${artist.image}" alt="${artist.name}" 
+             style="
+               width: 100%; 
+               height: 150px; 
+               object-fit: cover; 
+               border-radius: 6px; 
+               margin-top: 0.5rem;
+             ">`
+      : ''
+  }
+`;
+    card.onclick = () => renderArtistPage(artist);
+    grid.appendChild(card);
+  });
+
+  if (filteredArtists.length === 0) {
+    content.innerHTML = `<p style="opacity:0.6;text-align:center;">No artists found.</p>`;
+    return;
+  }
+
+  content.appendChild(grid);
+
+  // ---- ADD RAINBOW GLOW TO RADIOHEAD ----
+  document.querySelectorAll(".card h3").forEach(h3 => {
+    if (h3.textContent === "Radiohead") {
+      h3.classList.add("rainbow-glow");
+    }
+  });
+// Add glow container & particles for Radiohead
+document.querySelectorAll(".card h3").forEach(h3 => {
+  if (h3.textContent === "Radiohead") {
+    // wrap h3 in glow-container
+    const wrapper = document.createElement("div");
+    wrapper.className = "glow-container";
+    h3.parentNode.replaceChild(wrapper, h3);
+    wrapper.appendChild(h3);
+
+    h3.classList.add("rainbow-glow");
+
+    // create particles
+    for (let i = 0; i < 10; i++) {
+      const particle = document.createElement("div");
+      particle.className = "particle";
+
+      // random directions
+      particle.style.setProperty("--x", `${Math.random() * 67 - 20}px`);
+      particle.style.setProperty("--y", `${Math.random() * 40 - 20}px`);
+
+      // random delay
+      particle.style.animationDelay = `${Math.random() * 3}s`;
+
+      wrapper.appendChild(particle);
+    }
+  }
+});
+}
+
+
+function renderArtistPage(artist) {
+  // Clear previous content and player
+  content.innerHTML = "";
+  player.innerHTML = "";
+
+  // Back button
+  const backBtn = document.createElement("div");
+  backBtn.className = "back-btn";
+  backBtn.textContent = "← Back to artists";
+  backBtn.onclick = renderHome;
+  content.appendChild(backBtn);
+
+  // Artist name header
+  const artistHeader = document.createElement("h3");
+  artistHeader.textContent = artist.name;
+  artistHeader.style.textAlign = "center";
+  artistHeader.style.margin = "1rem 0";
+  content.appendChild(artistHeader);
+
+  // Album grid
+  const grid = document.createElement("div");
+  grid.className = "grid";
+
+  artist.albums.forEach(album => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    // Only show album name and year
+    card.innerHTML = `
+      <h3>${album.name}</h3>
+      <p>${album.year}</p>
+    `;
+
+    // Clicking the card loads the album in the player
+    card.onclick = () => {
+      player.innerHTML = `
+        <iframe
+          src="https://open.spotify.com/embed/album/${album.id}"
+          width="400"
+          height="480"
+          frameborder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy">
+        </iframe>
+      `;
+      player.scrollIntoView({ behavior: "smooth" });
+    };
+
+    grid.appendChild(card);
+  });
+
+  content.appendChild(grid);
+}
+
+
+
+document.getElementById("searchInput").addEventListener("input", renderHome);
+document.getElementById("categoryFilter").addEventListener("change", renderHome);
+
+document.getElementById("clearSearch").onclick = () => {
+  searchInput.value = "";
+  categoryFilter.value = "all";
+  renderHome();
+};
+
+const backToSearchBtn = document.getElementById("backToSearch");
+const searchBar = document.getElementById("searchInput");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 400) {
+    backToSearchBtn.classList.add("show");
+  } else {
+    backToSearchBtn.classList.remove("show");
+  }
+});
+
+backToSearchBtn.onclick = () => {
+  searchBar.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+
+// ------------------- INIT -------------------
+window.onload = renderHome;
+
+</script>
+
+</body>
+</html>
